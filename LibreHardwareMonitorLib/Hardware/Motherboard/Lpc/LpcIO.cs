@@ -301,7 +301,7 @@ namespace LibreHardwareMonitor.Hardware.Motherboard.Lpc
                     switch (revision & 0xF0)
                     {
                         case 0x50:
-                            chip = Chip.NCT610X;
+                            chip = Chip.NCT610XD;
                             logicalDeviceNumber = WINBOND_NUVOTON_HARDWARE_MONITOR_LDN;
                             break;
                     }
@@ -364,6 +364,10 @@ namespace LibreHardwareMonitor.Hardware.Motherboard.Lpc
                             chip = Chip.NCT6796D;
                             logicalDeviceNumber = WINBOND_NUVOTON_HARDWARE_MONITOR_LDN;
                             break;
+                        case 0x2A:
+                            chip = Chip.NCT6796DR;
+                            logicalDeviceNumber = WINBOND_NUVOTON_HARDWARE_MONITOR_LDN;
+                            break;
                         case 0x51:
                             chip = Chip.NCT6797D;
                             logicalDeviceNumber = WINBOND_NUVOTON_HARDWARE_MONITOR_LDN;
@@ -395,7 +399,7 @@ namespace LibreHardwareMonitor.Hardware.Motherboard.Lpc
                 ushort vendorId = port.ReadWord(FINTEK_VENDOR_ID_REGISTER);
 
                 // disable the hardware monitor i/o space lock on NCT679*D chips
-                if (address == verify && (chip == Chip.NCT6791D || chip == Chip.NCT6796D || chip == Chip.NCT6793D || chip == Chip.NCT6795D || chip == Chip.NCT6798D || chip == Chip.NCT6797D))
+                if (address == verify && (chip == Chip.NCT6791D || chip == Chip.NCT6796D || chip == Chip.NCT6796DR || chip == Chip.NCT6793D || chip == Chip.NCT6795D || chip == Chip.NCT6798D || chip == Chip.NCT6797D))
                 {
                     port.NuvotonDisableIOSpaceLock();
                 }
@@ -443,7 +447,7 @@ namespace LibreHardwareMonitor.Hardware.Motherboard.Lpc
                         _superIOs.Add(new W836XX(chip, revision, address));
                         break;
                     }
-                    case Chip.NCT610X:
+                    case Chip.NCT610XD:
                     case Chip.NCT6771F:
                     case Chip.NCT6776F:
                     case Chip.NCT6779D:
@@ -452,6 +456,7 @@ namespace LibreHardwareMonitor.Hardware.Motherboard.Lpc
                     case Chip.NCT6793D:
                     case Chip.NCT6795D:
                     case Chip.NCT6796D:
+                    case Chip.NCT6796DR:
                     case Chip.NCT6797D:
                     case Chip.NCT6798D:
                     {
@@ -495,7 +500,8 @@ namespace LibreHardwareMonitor.Hardware.Motherboard.Lpc
         private bool DetectIT87(LpcPort port)
         {
             // IT87XX can enter only on port 0x2E
-            if (port.RegisterPort != 0x2E)
+            // IT8792 using 0x4E
+            if (port.RegisterPort != 0x2E && port.RegisterPort != 0x4E)
                 return false;
 
 
@@ -549,6 +555,9 @@ namespace LibreHardwareMonitor.Hardware.Motherboard.Lpc
                     break;
                 case 0x8772:
                     chip = Chip.IT8772E;
+                    break;
+                case 0x8733:
+                    chip = Chip.IT879XE;
                     break;
                 default:
                     chip = Chip.Unknown;
